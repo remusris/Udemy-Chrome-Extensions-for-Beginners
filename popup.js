@@ -1,3 +1,4 @@
+//code example from chrome docs
 // chrome.runtime.onMessage.addListener(
 //     function(request, sender, sendResponse) {
 //       if (request.greeting === "hello")
@@ -24,11 +25,19 @@
 // console.log(message);
 // });
 
-chrome.runtime.sendMessage({ method: "getStatus", data: "xxx" }, function (res) {
-  // document.getElementById("popupElement1").innerText = res.method;
-  // document.getElementById("popupElement2").innerText = res.data;
-  console.log(res.method);
-  console.log(res.data);
+browsingHistoryList = [];
+
+//code example from stackoverflow with the "handshake" idea
+chrome.runtime.sendMessage({data: "getStatus" }, function(response) {
+  console.log(response.data);
 
 return true;
 });
+
+chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
+	// str = JSON.stringify(message.data);
+    sendResponse({data: "request recieved"});
+    // browsingHistoryList.append(message.data);
+    console.log(message.data);
+    
+}); 
