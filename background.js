@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       chrome.history.search({
         text: '',
         startTime: oneWeekAgo,
-        maxResults: 8
+        maxResults: 30
         },  
     
         function(data) {
@@ -51,4 +51,5 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     });      
   }
 });
+
 

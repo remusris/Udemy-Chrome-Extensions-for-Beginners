@@ -34,10 +34,32 @@ chrome.runtime.sendMessage({data: "getStatus" }, function(response) {
 return true;
 });
 
+//listen to the onMessage request and push to the browsing history list
 chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
 	// str = JSON.stringify(message.data);
     sendResponse({data: "request recieved"});
     // browsingHistoryList.append(message.data);
     console.log(message.data);
-    
+    browsingHistoryList.push(message);
 }); 
+
+console.log(browsingHistoryList);
+
+listItem = document.getElementById("li");
+
+var ul = document.createElement("ul");
+
+function createList(arrayName) {
+  for (var i = 0 ; i < arrayName.length; i++) {
+
+  li = document.createElement("li"); 
+  li.innerHTML = i;
+  ul.appendChild(i);
+
+  };
+  
+  
+
+};
+
+createList(browsingHistoryList)
