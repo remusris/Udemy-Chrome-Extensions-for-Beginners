@@ -19,6 +19,7 @@
 //         });
 //         });
 
+otherBrowsingHistoryList = []
 
 const millisecondsPerWeek = 1000 * 60 * 60 *24 * 7; 
 const oneWeekAgo = (new Date).getTime() - millisecondsPerWeek;
@@ -41,8 +42,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 // var timeInMilliseconds = page.lastVisitTime;
                 // let newDate = new Date(timeInMilliseconds);
                 // browsingHistoryList.push(newDate);
+                otherBrowsingHistoryList.push(page.url)
                 chrome.runtime.sendMessage(
-                    {data: page.url}, function(response) {
+                    page.url, function(response) {
                             // console.log(response.data);
                             // console.log(page.url);
                     }
@@ -52,4 +54,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
+console.log(otherBrowsingHistoryList)
+console.log(otherBrowsingHistoryList[0])
 
+
+
+randomList = [4,5,6,12]
+console.log(randomList)
+console.log(randomList[0])
