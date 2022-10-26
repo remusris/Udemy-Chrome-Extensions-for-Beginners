@@ -134,9 +134,9 @@ function buildTypedUrlList(divName) {
 //   };
 // }
 
-document.addEventListener('DOMContentLoaded', function () {
-  buildTypedUrlList("typedUrl_div");
-});
+// document.addEventListener('DOMContentLoaded', function () {
+//   buildTypedUrlList("typedUrl_div");
+// });
 
 
 
