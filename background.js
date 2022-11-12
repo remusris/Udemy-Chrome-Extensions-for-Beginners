@@ -62,15 +62,18 @@
 
 
 
-
+//my previous code
 
 var microsecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
+var microsecondsPerDay = 1000 * 60 * 60 * 24;
+var microsecondsPerHour = 1000 * 60 * 60;
 var oneWeekAgo = (new Date).getTime() - microsecondsPerWeek;
+var oneHourAgo = (new Date).getTime() - microsecondsPerHour;
 var visitItemsList = [];
 
 chrome.history.search({
     'text': '',              
-    'startTime': oneWeekAgo  
+    'startTime': oneHourAgo  
     },
     function(historyItems) {
     for (var i = 0; i < historyItems.length; ++i) {
@@ -80,11 +83,14 @@ chrome.history.search({
         // Use a closure to bind the  url into the callback's args.
         return function(visitItems) {
             processVisits(url, visitItems);
-            console.log(visitItems);
+            // console.log(url);
+            // console.log(visitItems);
         };
         };
         chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
+        console.log(visitItemsList);
     }
+    // console.log(visitItemsList[1])
 });
 
 
@@ -92,8 +98,10 @@ chrome.history.search({
 
 var processVisits = function(url, visitItems) {
     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
-        visitItemsList.push(visitItems[i])
+        visitItemsList.push(url)
+        visitItemsList.push(visitItems[i].transition)
         }
     }
+
 
 
