@@ -67,9 +67,15 @@
 var microsecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
 var microsecondsPerDay = 1000 * 60 * 60 * 24;
 var microsecondsPerHour = 1000 * 60 * 60;
+var microsecondsPerQuarterHour = 1000 * 60 * 60 * 0.25;
 var oneWeekAgo = (new Date).getTime() - microsecondsPerWeek;
 var oneHourAgo = (new Date).getTime() - microsecondsPerHour;
+var oneDayAgo = (new Date).getTime() - microsecondsPerDay;
+var fifteenMinutesAgo = (new Date).getTime() - microsecondsPerQuarterHour;
 var visitItemsList = [];
+var otherList = [];
+var currentDate =(new Date).getTime()
+console.log(currentDate);
 
 chrome.history.search({
     'text': '',              
@@ -78,30 +84,71 @@ chrome.history.search({
     function(historyItems) {
     for (var i = 0; i < historyItems.length; ++i) {
         var url = historyItems[i].url;
+        // this code is redundant
+        // visitItemsList.push(historyItems[i].id);
         var processVisitsWithUrl = function(url) {
         // We need the url of the visited item to process the visit.
         // Use a closure to bind the  url into the callback's args.
         return function(visitItems) {
             processVisits(url, visitItems);
-            // console.log(url);
-            // console.log(visitItems);
+            console.log(url);
+            console.log(visitItems);
         };
         };
         chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
-        console.log(visitItemsList);
+        // console.log(visitItemsList);
     }
-    // console.log(visitItemsList[1])
+    // console.log(visitItemsList);
+    // console.log(otherList);
+    console.log(historyItems.length);
 });
 
 
 
 
+// var processVisits = function(url, visitItems) {
+//     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+//         visitItemsList.push(url)
+        
+//         if (visitItems[i].visitTime >= oneHourAgo) {
+//             visitItemsList.push(visitItems[i].transition)
+//         }
+//         // visitItemsList.push(visitItems[i])
+//         }
+//     }
+
+    // for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+    //         visitItemsList.push(url)
+
+    //         if (visitItems[i].visitTime >= oneHourAgo) {
+    //             pass
+    //         } else {
+    //             visitItemsList.push(visitItems[i].transition)
+    //         }
+    //     }
+    // }
+
+// var convertDateToEpoch = function(date) {
+//     return Date.parse(date)
+// }
+
+
 var processVisits = function(url, visitItems) {
     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
-        visitItemsList.push(url)
-        visitItemsList.push(visitItems[i].transition)
+        if (visitItems[i].visitTime >= oneHourAgo) {
+            visitItemsList.push(url);
+            visitItemsList.push(visitItems[i].id);
+            visitItemsList.push(visitItems[i].transition);
+            visitItemsList.push(visitItems[i].referringVisitId)
+        } else {
+            otherList.push(url)
+            otherList.push(visitItems[i].id);
+            otherList.push(visitItems[i].transition);
+            otherList.push(visitItems[i].referringVisitId)
+        }
+        
+        
+        
+        // visitItemsList.push(visitItems[i].)
         }
     }
-
-
-
