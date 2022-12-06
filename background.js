@@ -91,15 +91,15 @@ chrome.history.search({
         // Use a closure to bind the  url into the callback's args.
         return function(visitItems) {
             processVisits(url, visitItems);
-            console.log(url);
-            console.log(visitItems);
+            // console.log(url);
+            // console.log(visitItems);
         };
         };
         chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
         // console.log(visitItemsList);
     }
-    // console.log(visitItemsList);
-    // console.log(otherList);
+    console.log(visitItemsList);
+    console.log(otherList);
     console.log(historyItems.length);
 });
 
@@ -136,19 +136,21 @@ chrome.history.search({
 var processVisits = function(url, visitItems) {
     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
         if (visitItems[i].visitTime >= oneHourAgo) {
-            visitItemsList.push(url);
-            visitItemsList.push(visitItems[i].id);
-            visitItemsList.push(visitItems[i].transition);
-            visitItemsList.push(visitItems[i].referringVisitId)
+                visitItemsList.push(url);
+                visitItemsList.push(visitItems[i]);
+        //     visitItemsList.push(visitItems[i].id);
+        //     visitItemsList.push(visitItems[i].transition);
+        //     visitItemsList.push(visitItems[i].referringVisitId)
         } else {
-            otherList.push(url)
-            otherList.push(visitItems[i].id);
-            otherList.push(visitItems[i].transition);
-            otherList.push(visitItems[i].referringVisitId)
+                otherList.push(url)
+                otherList.push(visitItems[i]);
+        //     otherList.push(visitItems[i].id);
+        //     otherList.push(visitItems[i].transition);
+        //     otherList.push(visitItems[i].referringVisitId)
         }
         
         
+        // visitItemsList.push(visitItems[i])
         
-        // visitItemsList.push(visitItems[i].)
         }
     }
