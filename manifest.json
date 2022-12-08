@@ -9,6 +9,12 @@
     "action": {
         "default_popup": "popup.html"
     },
-    "permissions": ["history"]
+    "content_scripts": [
+        {
+            "matches": ["*://*/*", "http://*/*", "https://*/*"],
+            "js": ["content-script.js"]
+        }
+    ],
+    "permissions": ["history", "webNavigation", "activeTab", "tabs"]
 }
         

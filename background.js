@@ -74,18 +74,22 @@ var oneDayAgo = (new Date).getTime() - microsecondsPerDay;
 var fifteenMinutesAgo = (new Date).getTime() - microsecondsPerQuarterHour;
 var visitItemsList = [];
 var otherList = [];
+var historyItemsList = [];
+var urlList = [];
 var currentDate =(new Date).getTime()
 console.log(currentDate);
 
 chrome.history.search({
     'text': '',              
-    'startTime': oneHourAgo  
+    'startTime': oneDayAgo  
     },
     function(historyItems) {
     for (var i = 0; i < historyItems.length; ++i) {
-        var url = historyItems[i].url;
+        var url = historyItems[i];
         // this code is redundant
         // visitItemsList.push(historyItems[i].id);
+        historyItemsList.push(url)
+        urlList.push(url.url)
         var processVisitsWithUrl = function(url) {
         // We need the url of the visited item to process the visit.
         // Use a closure to bind the  url into the callback's args.
@@ -95,12 +99,14 @@ chrome.history.search({
             // console.log(visitItems);
         };
         };
-        chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
+        chrome.history.getVisits({url: url.url}, processVisitsWithUrl(url));
         // console.log(visitItemsList);
     }
-    console.log(visitItemsList);
-    console.log(otherList);
-    console.log(historyItems.length);
+    // console.log(visitItemsList);
+    // // console.log(otherList);
+    // console.log(historyItems.length);
+    // console.log(urlList);
+    // console.log(historyItemsList)
 });
 
 
@@ -135,22 +141,74 @@ chrome.history.search({
 
 var processVisits = function(url, visitItems) {
     for (var i = 0, ie = visitItems.length; i < ie; ++i) {
-        if (visitItems[i].visitTime >= oneHourAgo) {
+        if (visitItems[i].visitTime >= oneDayAgo) {
                 visitItemsList.push(url);
                 visitItemsList.push(visitItems[i]);
-        //     visitItemsList.push(visitItems[i].id);
-        //     visitItemsList.push(visitItems[i].transition);
-        //     visitItemsList.push(visitItems[i].referringVisitId)
+                // visitItemsList.push(visitItems[i].id);
+                // visitItemsList.push(visitItems[i].transition);
+                // visitItemsList.push(visitItems[i].referringVisitId)
         } else {
                 otherList.push(url)
-                otherList.push(visitItems[i]);
-        //     otherList.push(visitItems[i].id);
-        //     otherList.push(visitItems[i].transition);
-        //     otherList.push(visitItems[i].referringVisitId)
+                // otherList.push(visitItems[i]);
+                // otherList.push(visitItems[i].id);
+                // otherList.push(visitItems[i].transition);
+                // otherList.push(visitItems[i].referringVisitId)
         }
-        
         
         // visitItemsList.push(visitItems[i])
         
         }
     }
+
+
+// chrome.webNavigation.onBeforeNavigate.addListener(
+//     function(objectBeforeNavigate) {
+//         console.log(objectBeforeNavigate.url)
+//         console.log(objectBeforeNavigate.tabId)
+//     }    
+// )
+
+// chrome.webNavigation.onCommitted.addListener(
+//     function(objectOnCommited) {
+//         console.log(objectOnCommited.url)
+//         console.log(objectOnCommited.tabId)
+//     }
+// )
+
+// chrome.webNavigation.onHistoryStateUpdated.addListener(
+//     function(objectHistoryStateUpdated) {
+//         console.log(objectHistoryStateUpdated.url)
+//         console.log(objectHistoryStateUpdated.tabId) 
+//     }
+// )
+
+
+
+// var Anchors = document.getElementsByTagName("a");
+
+// for (var i = 0; i < Anchors.length ; i++) {
+//     Anchors[i].addEventListener("click", 
+//         function (event) {
+//             event.preventDefault();
+//             if (confirm('Are you sure?')) {
+//                 window.location = this.href;
+//             }
+//         }, 
+//         false);
+// }
+
+// function injectedFunction() {
+//     document.body.style.backgroundColor = 'orange';
+//   }
+  
+//   chrome.action.onClicked.addListener((tab) => {
+//     chrome.scripting.executeScript({
+//       target: { tabId: tab.id },
+//       func: injectedFunction
+//     });
+//   });
+
+
+chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
+    console.log(message)
+});
