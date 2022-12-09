@@ -123,18 +123,39 @@
 
 
 
-const anchorTags = document.querySelectorAll('a');
+// const anchorTags = document.querySelectorAll('a');
 
-window.onload = function () {
-    anchorTags.forEach((tag) => {
-        tag.addEventListener('click', (event) => {
+// window.onload = function () {
+//     anchorTags.forEach((tag) => {
+//         tag.addEventListener('click', (event) => {
             
-            const currentURL = JSON.stringify(window.location.href);
-            const targetURL = JSON.stringify(event.target.href);
-            chrome.runtime.sendMessage({message: currentURL})
+//             const currentURL = JSON.stringify(window.location.href);
+//             const targetURL = JSON.stringify(event.target.href);
+//             chrome.runtime.sendMessage({message: currentURL});
+//             chrome.runtime.sendMessage({message: targetURL});
 
-        });
-      });
-}
+//         });
+//       });
+// }
+
+// window.onload = function () {
+
+//     window.addEventListener('hashchange', (event) => {
+    
+//         const preHashedURL = JSON.stringify(window.location.href);
+//         const postHashedURL = JSON.stringify(event.target.href);
+//         chrome.runtime.sendMessage({message: preHashedURL});
+//         chrome.runtime.sendMessage({message: postHashedURL});
+//         });
+
+// }
+
+
+window.addEventListener('popstate', function(event) {
+    const prePopURL = JSON.stringify(window.location.href);
+    chrome.runtime.sendMesage({message: prePopURL});
+}  
+
+
 
 
