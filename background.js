@@ -276,3 +276,51 @@ chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
 //     console.log(tabURL);
 // })
 
+realTimeURLs = []
+
+
+chrome.history.onVisited.addListener(
+    function (historyObject) {
+        timeOfURLVisit = historyObject.lastVisitTime
+        console.log(historyObject);
+        console.log(historyObject.lastVisitTime);
+
+        chrome.tabs.query({active: true},function (tab) {
+            console.log(tab[tab.length-1])
+        })
+
+        chrome.tabs.query({active: true, highlighted: true, currentWindow: true}, function (tab) {
+            console.log("active + currentWindow --- true")
+            console.log(tab[0])
+        })
+
+        chrome.history.getVisits({url: historyObject.url}, function (visitItems) {
+            for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+                if (visitItems[i].visitTime >= timeOfURLVisit) {
+                    realTimeURLs.push(visitItems[i])
+                    // console.log(visitItems[i])
+
+                    if (visitItems[i].transtion === "link" && visitItems[i].referringVisitId === "0") {
+
+                    }
+                }
+            }
+        })
+    }
+);
+
+
+chrome.webNavigation.onHistoryStateUpdated.addListener(
+    function (webNavObject) {
+        console.log(webNavObject)
+    }
+)
+
+chrome.history.onVisited.addListener(
+    function (historyObject) {
+        timeOfURLVisit = historyObject.lastVisitTime
+        console.log(historyObject);
+        console.log(historyObject.lastVisitTime);
+
+
+    });
