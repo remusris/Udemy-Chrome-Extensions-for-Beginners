@@ -102,11 +102,11 @@ chrome.history.search({
         chrome.history.getVisits({url: url.url}, processVisitsWithUrl(url));
         // console.log(visitItemsList);
     }
-    // console.log(visitItemsList);
+    console.log(visitItemsList);
     // // console.log(otherList);
     // console.log(historyItems.length);
     // console.log(urlList);
-    // console.log(historyItemsList)
+    console.log(historyItemsList)
 });
 
 
@@ -211,4 +211,68 @@ var processVisits = function(url, visitItems) {
 
 chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
     console.log(message)
+
+    // chrome.tabs.query(function (tabs) {
+    //     tabURL = tabs.highlighted;
+    //     console.log(tabURL);
+    // })
 });
+
+
+/* This didn't work */
+// chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
+//     if (message.type === "tabID") {
+//         console.log(message.contents)
+//     }
+
+//     if (message.type === "nextURL") {
+//         console.log(message.contents)
+//     }
+// });
+
+
+
+/* This worked */
+// chrome.webNavigation.onHistoryStateUpdated.addListener(
+//     function (historyStateObject) {
+
+//         const NEXTurl = JSON.stringify(historyStateObject.url);
+//         const tabID = JSON.stringify(historyStateObject.tabId);
+        
+//         // chrome.runtime.sendMessage({type: "tabID", contents: tabID});
+//         // chrome.runtime.sendMessage({type: "nextURL", contents: NEXTurl});
+
+//         console.log(NEXTurl);
+//         console.log(tabID);
+//     }
+// )
+
+// chrome.webNavigation.onBeforeNavigate.addListener(
+//     function (onBeforeUpdateObject) {
+//         const curURL = JSON.stringify(onBeforeUpdateObject.url);
+//         console.log(curURL);
+//     }
+// )
+
+
+/* This is going to be the major function of how parse out the active tabID with the history listener all in real-time */
+// chrome.history.onVisited.addListener(
+//     function (onVisitedItem) {
+//         visitTimeOfURL = onVisitedItem.lastVisitTime
+//         chrome.history.getVisits(onVisitedItem, function (getVisitObject) {
+//             if (getVisitObject.visitTime > visitTimeOfURL) {
+
+//             } 
+//         })
+//     }
+// );
+
+// visitFilter = function
+
+
+
+// chrome.tabs.query({"active": true, "highlighted": true}, function (tabs) {
+//     tabURL = tabs[0].url;
+//     console.log(tabURL);
+// })
+
