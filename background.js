@@ -212,6 +212,9 @@ var processVisits = function(url, visitItems) {
 chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
     console.log(message)
 
+    // if (message.type === "url type" ) {
+    //     chrome
+    // }
     // chrome.tabs.query(function (tabs) {
     //     tabURL = tabs.highlighted;
     //     console.log(tabURL);
@@ -220,15 +223,16 @@ chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
 
 
 /* This didn't work */
-// chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
-//     if (message.type === "tabID") {
-//         console.log(message.contents)
-//     }
+chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
+    // if (message.type === "tabID") {
+    //     console.log(message.contents)
+    // }
 
-//     if (message.type === "nextURL") {
-//         console.log(message.contents)
-//     }
-// });
+    // if (message.type === "nextURL") {
+    //     console.log(message.contents)
+    // }
+
+});
 
 
 
@@ -276,51 +280,110 @@ chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
 //     console.log(tabURL);
 // })
 
-realTimeURLs = []
+/* It seems that the chrome.history.onVisited event listener is creating multiple entries 
+before it actually gets recognized as an official history item that's makes this process
+much harder than it needs to be  */
 
+// realTimeURLs = []
+
+// chrome.history.onVisited.addListener(
+//     function (historyObject) {
+//         timeOfURLVisit = historyObject.lastVisitTime
+//         console.log(historyObject);
+//         console.log(historyObject.lastVisitTime);
+
+//         chrome.tabs.query({active: true},function (tab) {
+//             console.log(tab[tab.length-1])
+//         })
+
+//         chrome.tabs.query({active: true, highlighted: true, currentWindow: true}, function (tab) {
+//             console.log("active + currentWindow --- true")
+//             console.log(tab[0])
+//         })
+
+//         chrome.history.getVisits({url: historyObject.url}, function (visitItems) {
+//             for (var i = 0, ie = visitItems.length; i < ie; ++i) {
+//                 if (visitItems[i].visitTime >= timeOfURLVisit) {
+//                     realTimeURLs.push(visitItems[i])
+//                     // console.log(visitItems[i])
+
+//                     if (visitItems[i].transtion === "link" && visitItems[i].referringVisitId === "0") {
+
+//                     }
+//                 }
+//             }
+//         })
+//     }
+// );
+
+
+// chrome.webNavigation.onHistoryStateUpdated.addListener(
+//     function (webNavObject) {
+//         console.log(webNavObject)
+//     }
+// )
+
+// chrome.history.onVisited.addListener(
+//     function (historyObject) {
+//         timeOfURLVisit = historyObject.lastVisitTime
+//         // console.log(historyObject);
+//         console.log("onVisited " + historyObject.lastVisitTime);
+
+// });
+ 
+randoList = []
 
 chrome.history.onVisited.addListener(
     function (historyObject) {
         timeOfURLVisit = historyObject.lastVisitTime
-        console.log(historyObject);
-        console.log(historyObject.lastVisitTime);
+        console.log(historyObject)
+//         chrome.history.search({"text": "","startTime": fifteenMinutesAgo}, function (historyItemz) {
+//             for (var i; i < historyItemz.length; ++i) {
+//                 randoList.push(historyItemz[i])   
+//             }
+//         });
+//         console.log(randoList);
+});
 
-        chrome.tabs.query({active: true},function (tab) {
-            console.log(tab[tab.length-1])
-        })
-
-        chrome.tabs.query({active: true, highlighted: true, currentWindow: true}, function (tab) {
-            console.log("active + currentWindow --- true")
-            console.log(tab[0])
-        })
-
-        chrome.history.getVisits({url: historyObject.url}, function (visitItems) {
-            for (var i = 0, ie = visitItems.length; i < ie; ++i) {
-                if (visitItems[i].visitTime >= timeOfURLVisit) {
-                    realTimeURLs.push(visitItems[i])
-                    // console.log(visitItems[i])
-
-                    if (visitItems[i].transtion === "link" && visitItems[i].referringVisitId === "0") {
-
-                    }
-                }
-            }
-        })
+chrome.history.search({"text":"", "startTime": }, function (object) {
+    for (var i; i < object.length; ++i) {
+        console.log(object[i]);   
     }
-);
+});
 
 
-chrome.webNavigation.onHistoryStateUpdated.addListener(
-    function (webNavObject) {
-        console.log(webNavObject)
-    }
-)
+/* this does not seem to be working the way it should */
+// chrome.webNavigation.onDOMContentLoaded.addListener(
+//     function (DOMObject) {
+//         console.log("DOMContentLoaded " + DOMObject.timeStamp)
+//     }
+// );
 
-chrome.history.onVisited.addListener(
-    function (historyObject) {
-        timeOfURLVisit = historyObject.lastVisitTime
-        console.log(historyObject);
-        console.log(historyObject.lastVisitTime);
+/* this updates too late it appears */
+// chrome.webNavigation.onHistoryStateUpdated.addListener(
+//     function (historyStateObjectUpdated) {
+//         console.log("historyStateObjectUpdated " + historyStateObjectUpdated.timeStamp)
+//     }
+// )
+
+/* too many requests */
+// chrome.webNavigation.onCommitted.addListener(
+//     function(onCommitedObject) {
+//         console.log(onCommitedObject)
+//     }
+// )
 
 
-    });
+/* this was not optimal either */
+// chrome.webNavigation.onCompleted.addListener(
+//     function(onCompletedObject) { 
+//         console.log(onCompletedObject);
+//     }
+// )
+
+/* This wasn't optimal */
+// chrome.webNavigation.onCreatedNavigationTarget.addListener(
+//     function(NavigationObject) {
+//         console.log(NavigationObject)
+//     }    
+// )

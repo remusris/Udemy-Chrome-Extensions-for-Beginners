@@ -124,20 +124,20 @@
 
 
 /* this works VERY WELL */
-const anchorTags = document.querySelectorAll('a');
+// const anchorTags = document.querySelectorAll('a');
 
-window.onload = function () {
-    anchorTags.forEach((tag) => {
-        tag.addEventListener('click', (event) => {
+// window.onload = function () {
+//     anchorTags.forEach((tag) => {
+//         tag.addEventListener('click', (event) => {
             
-            const currentURL = JSON.stringify(window.location.href);
-            const targetURL = JSON.stringify(event.target.href);
-            chrome.runtime.sendMessage({message: currentURL});
-            chrome.runtime.sendMessage({message: targetURL});
+//             const currentURL = JSON.stringify(window.location.href);
+//             const targetURL = JSON.stringify(event.target.href);
+//             chrome.runtime.sendMessage({message: currentURL});
+//             chrome.runtime.sendMessage({message: targetURL});
 
-        });
-      });
-}
+//         });
+//       });
+// }
 
 /* this doesn't work */
 // window.onload = function () {
@@ -211,23 +211,25 @@ window.onload = function () {
 /* this didn't work */
 // window.addEventListener('popstate', function(e){
 //     chrome.runtime.sendMessage({message: "test"});
-//     });
+//     });t
 
 
 /* https://stackoverflow.com/questions/53303519/detect-an-url-change-in-a-spa */
-// let previousUrl = '';
-// const observer = new MutationObserver(function(mutations) {
-//   if (location.href !== previousUrl) {
-//       previousUrl = location.href;
-//       console.log(`URL changed to ${location.href}`);
-      
-//       chrome.runtime.sendMessage({message: `${location.href}`});
-//     //   chrome.runtime.sendMessage({message: `url bump`});
+let previousUrl = '';
+const observer = new MutationObserver(function(mutations) {
+  if (location.href !== previousUrl) {
+      previousUrl = location.href;
+    //   console.log(`URL changed to ${location.href}`);
+    
+    timeOfURL = JSON.stringify((new Date).getTime());
+    // chrome.runtime.sendMessage({message: `${location.href}`});
+    chrome.runtime.sendMessage({message: "url time", contents: timeOfURL});
+    
 
-//     }
-// });
-// const config = {subtree: true, childList: true};
-// observer.observe(document, config);
+    }
+});
+const config = {subtree: true, childList: true};
+observer.observe(document, config);
 
 
 
@@ -340,12 +342,12 @@ will need to bind the mutation observer to this click function
 //         const tabID = JSON.stringify(historyStateObject.tabId);
         
 //         // chrome.runtime.sendMessage({type: "tabID", contents: tabID});
-//         // chrome.runtime.sendMessage({type: "nextURL", contents: NEXTurl});
+//         chrome.runtime.sendMessage({contents: NEXTurl});
 
-//         console.log(NEXTurl);
-//         console.log(tabID);
+//         // console.log(NEXTurl);
+//         // console.log(tabID);
 //     }
-// )
+// );
 
 
 // let previousUrl = document.location.href;
@@ -402,13 +404,13 @@ will need to bind the mutation observer to this click function
 // observer.observe(document, config);
 
 
+/* This works but it's not particularly useful */
 
-
-//   window.addEventListener("click", function() {
+// window.addEventListener("click", function() {
 
 //     chrome.runtime.sendMessage({message: "test"});
 
-// })
+// });
 
 
 
