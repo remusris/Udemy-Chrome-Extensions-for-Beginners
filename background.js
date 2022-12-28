@@ -497,12 +497,24 @@ randoList = []
 // )
 
 
-chrome.tabs.onCreated.addListener( function (tab) {
-    console.log(tab)
-})
+// chrome.tabs.onCreated.addListener( function (tab) {
+//     console.log("onCreated")
+//     console.log(tab)
+// })
 
-chrome.tabs.onUpdated.addListener( function (tabID, changeInfo, tab) {
-    console.log(tabID);
-    console.log(changeInfo);
-    console.log(tab);
-})
+// chrome.tabs.onUpdated.addListener( function (tabID, changeInfo, tab) {
+//     // console.log(tabID);
+//     // console.log(changeInfo);
+//     console.log("onUpdated")
+//     console.log(tab);
+// })
+
+/* This is it!!!!! This is going to work!!!!!! Now we need to make an index of most recently activated tabs with newly created tabs */
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+    console.log("The user changed to tab with id: " + activeInfo.tabId);
+  });
+  
+  chrome.tabs.onCreated.addListener(function(tab) {
+    console.log("A new tab was created with id: " + tab.id);
+  });
