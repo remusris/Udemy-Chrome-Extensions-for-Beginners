@@ -296,7 +296,7 @@ chrome.history.onVisited.addListener(
     function (historyObject) {
         timeOfURLVisit = new Date(parseInt(historyObject.lastVisitTime));
        
-        console.log(historyObject);
+        // console.log(historyObject);
         // console.log(timeOfURLVisit);
         
 
@@ -370,7 +370,7 @@ chrome.history.onVisited.addListener(
             for (var i = 0, ie = visitItems.length; i < ie; ++i) {
                 if (visitItems[i].visitTime >= timeOfURLVisit) {
                     realTimeURLs.push(visitItems[i])
-                    console.log(visitItems[i])
+                    // console.log(visitItems[i])
 
                     // if (visitItems[i].transtion === "link" && visitItems[i].referringVisitId === "0") {
 
@@ -511,10 +511,165 @@ randoList = []
 
 /* This is it!!!!! This is going to work!!!!!! Now we need to make an index of most recently activated tabs with newly created tabs */
 
+tabIndex = []
+
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     console.log("The user changed to tab with id: " + activeInfo.tabId);
+    
+    activeTabID = activeInfo.tabId
+    console.log("activeTabID at the onActivated")
+    console.log(activeTabID)
+
+    chrome.tabs.get(activeTabID, function (tab) {
+        console.log(tab.url)
+
+        if (tabIndex.length == 0) {
+            tabIndex.push({tabID: activeTabID, url: tab.url})
+        }
+
+        if (tabIndex.length == 1) {
+            if (tabIndex[0].tabID != activeTabID) {
+                tabIndex.push({tabID: activeTabID, url: tab.url})
+            }
+        }
+
+        if (tabIndex.length == 2) {
+            if (tabIndex[0].tabID != activeTabID && tabIndex[1].tabID != activeTabID) {
+                //this should account for the double entry of a new tab
+                tabIndex.push({tabID: activeTabID, url: tab.url})
+            }
+
+            // if (tabIndex[0].tabID != activeTabID) {
+            //     tabIndex.push({tabID: activeTabID, url: tab.url})
+            // }
+        }
+        
+        
+        // tabIndex.push({tabID: activeTabID, url: tab.url})
+
+        // console.log(tabIndex)
+
+        //This is excellent code, but fails to do the basic sendTab functionality
+        // for (var i = 0, ie = tabIndex.length; i < ie; ++i) {
+        //     if (tabIndex[i].tabID != activeTabID && tabIndex[i+1].tabID != activeTabID) {
+        //         tabIndex.push({tabID: activeTabID, url: tab.url})
+        //     }
+        // }
+
+        // tabIndex.push({tabID: activeTabID, url: tab.url})
+
+        if (tabIndex.length == 3) {
+            tabIndex.shift()
+        }
+
+        console.log("onActivated Listener")
+        console.log(tabIndex)
+        // console.log("URL " + tabIndex[0].url)
+        // console.log("index " + tabIndex[0].tabID)
+    })
+
+    // chrome.tabs.onUpdated.addListener(
+    //     function (tabId, changeInfo, tab) {
+    //         console.log(changeInfo.url)
+    //     }
+    // )
+
+
   });
   
-  chrome.tabs.onCreated.addListener(function(tab) {
-    console.log("A new tab was created with id: " + tab.id);
+  chrome.tabs.onCreated.addListener(function(onCreatedInfo) {
+    console.log("A new tab was created with id: " + onCreatedInfo.id);
+
+    onCreatedTabID = onCreatedInfo.id
+
+    chrome.tabs.get(onCreatedTabID, function (tab) {
+        console.log(tab.url)
+        tabIndex.push({tabID: onCreatedTabID, url: tab.url})
+
+        if (tabIndex.length == 3) {
+            tabIndex.shift()
+        }
+
+        console.log("onCreated Listener")
+        console.log(tabIndex)
+    })
+
+    
   });
+
+   chrome.tabs.onUpdated.addListener(
+        function (tabId, changeInfo, tab) {
+            // for (var i = 0, ie = tabIndex.length; i < ie; ++i) {
+            //     // console.log(tabIndex[i])
+            //     // console.log(tabIndex.tabID[i])
+            //     // console.log(tabIndex[i].tabID)
+                
+
+            //     if (tabIndex[i].tabID == tabId) {
+            //         // tabIndex[i].tabID.splice(0, 0, changeInfo.url)
+            //         // console.log(tabIndex[i].url)
+            //         // console.log(changeInfo.url)
+            //         if (changeInfo.url !== undefined) {
+            //             // console.log(changeInfo.url)
+            //             tabIndex[i].url = changeInfo.url
+            //             console.log("url changeinfo")
+                        
+            //             // tabIndex[i].url == changeInfo.url
+            //             // valueToBeReplaced.splice(0,0,changeInfo.url )
+            //             // console.log(tabIndex[i].url)
+            //         }
+            //     }
+            // }
+            
+            // for some reason the new URL is not being added
+            if (changeInfo.url !== undefined) {
+                console.log("realURL change from changeinfo")
+                console.log(changeInfo.url)
+            }
+
+            for (var i = 0, ie = tabIndex.length; i < ie; ++i) {
+                if (tabId == tabIndex[i].tabID) {
+                    if (changeInfo.url !== undefined) {
+                        tabIndex[i].url = changeInfo.url
+                    }
+                }
+            }
+
+            /* this wasn't too smart */
+            // if (tabId == tabIndex[0].tabID) {
+            //     if (changeInfo.url !== tabIndex[0].url) {
+            //         if (changeInfo.url !== undefined) {
+            //             tabIndex[0].url = changeInfo.url 
+            //         }
+            //     }
+            // }
+
+            /* This will have to go to */
+            // if (tabId == tabIndex[1].tabID) {
+            //     if (changeInfo.url !== tabIndex[1].url) {
+            //         if (changeInfo.url !== undefined) {
+            //             tabIndex[1].url = changeInfo.url
+            //         } 
+            //     }
+            // }
+            
+            console.log("onUpdated Listener")
+            console.log(tabIndex)
+            
+        }
+    );
+
+
+
+  
+
+/* 
+    console.log("general changeinfo")
+            console.log(changeInfo)
+            // console.log(changeInfo.url)
+            console.log(tabIndex)
+            // console.log("first entry")
+            // console.log(tabIndex[0])
+            // console.log("second entry")
+            // console.log(tabIndex[1])
+            // console.log("tabID first entry" + tabIndex[0].tabID) */
