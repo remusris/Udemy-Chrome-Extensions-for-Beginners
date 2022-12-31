@@ -590,19 +590,19 @@ randoList = []
 //         }
 
 //         /* major new code contribution */
-//         if (activeURL[0].tabID == currentURL[0].tabID) {
+//        /*  if (activeURL[0].tabID == currentURL[0].tabID) {
 //             actualIndex.push(activeURL)
 //         }
 
 //         if (activeURL[0].tabID != currentURL[0].tabID) {
 //             actualIndex.push(activeURL)
 //             actualIndex.push(currentURL)
-//         }
+//         } */
 
 //         console.log("onActivated Listener")
 //         console.log(tabIndex)
-//         console.log("actualIndex")
-//         console.log(actualIndex)
+//         /* console.log("actualIndex")
+//         console.log(actualIndex) */
 //         // console.log("active url")
 //         // console.log(activeURL)
 //         /* console.log("URL " + tabIndex[0].url)
@@ -641,14 +641,14 @@ randoList = []
 //         }
 
 //         /* major new code contribution */
-//         if (activeURL[0].tabID == currentURL[0].tabID) {
+//         /* if (activeURL[0].tabID == currentURL[0].tabID) {
 //             actualIndex.push(activeURL)
 //         }
 
 //         if (activeURL[0].tabID != currentURL[0].tabID) {
 //             actualIndex.push(activeURL)
 //             actualIndex.push(currentURL)
-//         }
+//         } */
         
 //         /* first entry for the actual index */
 //         // if (actualIndex.length == 0) {
@@ -689,8 +689,8 @@ randoList = []
 
 //         console.log("onCreated Listener")
 //         console.log(tabIndex)
-//         console.log("actualIndex")
-//         console.log(actualIndex)
+//         /* console.log("actualIndex")
+//         console.log(actualIndex) */
 //     })
 
     
@@ -736,13 +736,13 @@ randoList = []
 //             }
 
 //             /* update change in URL in actualIndex */
-//             for (var i = 0, ie = actualIndex.length; i < ie; ++i) {
+//             /* for (var i = 0, ie = actualIndex.length; i < ie; ++i) {
 //                 if (tabId == actualIndex[i].tabID) {
 //                     if (changeInfo.url !== undefined) {
 //                         actualIndex[i].url = changeInfo.url
 //                     }
 //                 }
-//             }
+//             } */
 
 //             /* updates changes in URL on the activeURL */
 //             /* for (var i = 0, ie = activeURL.length; i < ie; ++i) {
@@ -797,14 +797,19 @@ randoList = []
             
 //             console.log("onUpdated Listener")
 //             console.log(tabIndex)
-//             console.log("actual index")
-//             console.log(actualIndex)
+//             /* console.log("actual index")
+//             console.log(actualIndex) */
             
 //         }
 //     );
 
 
-
+// chrome.windows.onCreated.addListener(
+//     function (window) {
+//         console.log("new window created")
+//         console.log(window.type)
+//     }
+// )
   
 
 /* 
@@ -822,9 +827,8 @@ randoList = []
 /* ---------------------------------------------------------------------------------------------------------------------------------------- */
 // This a huge divider and rethinking of everything we've done up to this point, let's restart and refresh out code here
 
-activeURL = []
-currentURL = []
-actualIndex = []
+activeURL= []
+historyURL = []
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     console.log("The user changed to tab with id: " + activeInfo.tabId);
@@ -836,43 +840,43 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.get(activeTabID, function (tab) {
         
         /* this is to record the active URL */
-        activeURL.push({tabID: activeTabID, url: tab.url})
-        console.log("activeURL")
-        console.log(activeURL)
+        activeURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
+        
+        /* this is to record the history URL */
+        // historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
 
-        /* this is to record the current URL */
-        currentURL.push({tabID: activeTabID, url: tab.url})
-        console.log("currentURL")
-        console.log(currentURL)
-
-        /* keep the length of the activeURL at 1 */
-        if (activeURL.length == 2) {
+        /* keep the length of the activeURL at 2 */
+        if (activeURL.length == 3) {
             activeURL.shift()
         }
 
-        /* keep the length of the currentURL at 1 */
-        if (currentURL.length == 2) {
-            currentURL.shift()
+        /* push url with no limitations, empty list */
+        if (historyURL.length == 0) {
+            historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
         }
 
-        /* major new code contribution */
-        if (activeURL.length == 1 && currentURL.length == 1) {
-            if (activeURL[0].tabID == currentURL[0].tabID) {
-                actualIndex.push(activeURL[0])
-            }
-
-            if (activeURL[0].tabID != currentURL[0].tabID) {
-                actualIndex.push(activeURL[0])
-                actualIndex.push(currentURL[0])
+        /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
+        if (historyURL.length == 1) {
+            if (historyURL[0].tabID != activeTabID) {
+                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
             }
         }
 
-        if (actualIndex.length >= 3) {
-
+        /* this is another block to prevent double entry of a new tab */
+        if (historyURL.length == 2) {
+            if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
+                //this should account for the double entry of a new tab
+                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+            }
         }
 
-        console.log("actualIndex")
-        console.log(actualIndex)
+        /* keep the length of the historyURL at 2 */
+        if (historyURL.length == 3) {
+            historyURL.shift()
+        }
+
+        console.log(historyURL)
+        
     })
 
   });
@@ -885,36 +889,57 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     onCreatedTabID = onCreatedInfo.id
 
     chrome.tabs.get(onCreatedTabID, function (tab) {
+        //add the latest created item to the history item
+        // historyURL.push({tabID: onCreatedInfo, url: tab.url, windowID: tab.windowId})
 
-        /* this is to record the currentURL */
-        currentURL.push({tabID: onCreatedTabID, url: tab.url})
-
-        /* keep currentURL at a minimum distance */
-        if (currentURL.length == 2) {
-            currentURL.shift()
+        /* push url with no limitations, empty list */
+        if (historyURL.length == 0) {
+            historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
         }
 
-        /* major new code contribution */
-        if (activeURL.length == 1 && currentURL.length == 1) {
-            if (activeURL[0].tabID == currentURL[0].tabID) {
-                actualIndex.push(activeURL[0])
+        /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
+        if (historyURL.length == 1) {
+            if (historyURL[0].tabID != activeTabID) {
+                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+            }
+        }
+
+        /* this is another block to prevent double entry of a new tab */
+        if (historyURL.length == 2) {
+            if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
+                //this should account for the double entry of a new tab
+                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL:""})
+            }
+        }
+
+        /* keep the length of the historyURL at 2 */
+        if (historyURL.length == 3) {
+            historyURL.shift()
+        }
+
+        /* filter for new tab */
+        if (activeURL.length == 2 && historyURL.length == 2) {
+            if (activeURL[1].tabID == historyURL.tabID) {
+                if (historyURL[1].windowID == historyURL[0].windowID) {
+                    historyURL[1].referralURL = historyURL[0].url
+                }
             }
 
-            if (activeURL[0].tabID != currentURL[0].tabID) {
-                actualIndex.push(activeURL[0])
-                actualIndex.push(currentURL[0])
+            if (historyURL[1].windowID != historyURL[1].windowID) {
+                historyURL[1].referralURL = activeURL[0].url
             }
+        }
 
-            if (actualIndex.length >= 3) {
-                incrementlength = actualIndex.length - 2
-                for (var i = 0, ie = incrementlength; i < ie; i++) {
-                    actualIndex.shift()
+        if (activeURL.length == 2 && historyURL.length == 2) {
+            if (activeURL[1].tabID != historyURL[1].tabID) {
+                if (historyURL[1].windowID == activeURL[1].windowID) {
+                    historyURL[1].referralURL = activeURL[1].url
                 }
             }
         }
+
+        console.log(historyURL)
         
-        console.log("actualIndex")
-        console.log(actualIndex)
     })
 
   });
@@ -929,31 +954,25 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             console.log(changeInfo.url)
         }
 
-        /* update change in URL in actualIndex */
-        for (var i = 0, ie = actualIndex.length; i < ie; ++i) {
-            if (tabId == actualIndex[i].tabID) {
+        /* update change in URL in historyURL */
+        for (var i = 0, ie = historyURL.length; i < ie; ++i) {
+            if (tabId == historyURL[i].tabID) {
                 if (changeInfo.url !== undefined) {
-                    actualIndex[i].url = changeInfo.url
+                    historyURL[i].url = changeInfo.url
                 }
             }
         }
 
-        /* revised version */
-        if (tabId == activeURL[0].tabID) {
-            if (changeInfo.url !== undefined) {
-                activeURL[0].url = changeInfo.url
+        /* update change in URL in activeURL */
+        for (var i = 0, ie = activeURL.length; i < ie; ++i) {
+            if (tabId == activeURL[i].tabID) {
+                if (changeInfo.url !== undefined) {
+                    activeURL[i].url = changeInfo.url
+                }
             }
         }
 
-        /* revised version */
-        if (tabId == currentURL[0].tabID) {
-            if (changeInfo.url !== undefined) {
-                currentURL[0].url = changeInfo.url
-            }
-        }
-    
-        console.log("actual index")
-        console.log(actualIndex)
+        console.log(historyURL)
         
     }
 );
