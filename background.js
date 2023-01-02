@@ -827,118 +827,357 @@ randoList = []
 /* ---------------------------------------------------------------------------------------------------------------------------------------- */
 // This a huge divider and rethinking of everything we've done up to this point, let's restart and refresh out code here
 
-activeURL= []
-historyURL = []
+// activeList= []
+// historyList = []
+
+// chrome.tabs.onActivated.addListener(function(activeInfo) {
+//     console.log("The user changed to tab with id: " + activeInfo.tabId);
+    
+//     activeTabID = activeInfo.tabId
+//     console.log("activeTabID at the onActivated")
+//     console.log(activeTabID)
+
+//     chrome.tabs.get(activeTabID, function (tab) {
+        
+//         /* this is to record the active URL */
+//         activeList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
+        
+//         /* this is to record the history URL */
+//         // historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
+
+//         /* keep the length of the activeURL at 2 */
+//         if (activeList.length == 3) {
+//             activeList.shift()
+//         }
+
+//         /* push url with no limitations, empty list */
+//         if (historyList.length == 0) {
+//             historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+//         }
+
+//         /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
+//         if (historyList.length == 1) {
+//             if (historyList[0].tabID != activeTabID) {
+//                 historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+//             }
+//         }
+
+//         /* this is another block to prevent double entry of a new tab */
+//         if (historyList.length == 2) {
+//             if (historyList[0].tabID != activeTabID && historyList[1].tabID != activeTabID) {
+//                 //this should account for the double entry of a new tab
+//                 historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+//             }
+//         }
+
+//         /* keep the length of the historyURL at 2 */
+//         if (historyList.length == 3) {
+//             historyList.shift()
+//         }
+
+//         console.log(historyList)
+        
+//     })
+
+//   });
+
+
+
+//   chrome.tabs.onCreated.addListener(function(onCreatedInfo) {
+//     console.log("A new tab was created with id: " + onCreatedInfo.id);
+
+//     onCreatedTabID = onCreatedInfo.id
+
+//     chrome.tabs.get(onCreatedTabID, function (tab) {
+//         //add the latest created item to the history item
+//         // historyURL.push({tabID: onCreatedInfo, url: tab.url, windowID: tab.windowId})
+
+//         /* push url with no limitations, empty list */
+//         if (historyURL.length == 0) {
+//             historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+//         }
+
+//         /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
+//         if (historyURL.length == 1) {
+//             if (historyURL[0].tabID != activeTabID) {
+//                 historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+//             }
+//         }
+
+//         /* this is another block to prevent double entry of a new tab */
+//         if (historyURL.length == 2) {
+//             if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
+//                 //this should account for the double entry of a new tab
+//                 historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL:""})
+//             }
+//         }
+
+//         /* keep the length of the historyURL at 2 */
+//         if (historyURL.length == 3) {
+//             historyURL.shift()
+//         }
+
+//         /* filter for new tab */
+//         if (activeURL.length == 2 && historyURL.length == 2) {
+//             if (activeURL[1].tabID == historyURL.tabID) {
+//                 if (historyURL[1].windowID == historyURL[0].windowID) {
+//                     historyURL[1].referralURL = historyURL[0].url
+//                 }
+//             }
+
+//             if (historyURL[1].windowID != historyURL[1].windowID) {
+//                 historyURL[1].referralURL = activeURL[0].url
+//             }
+//         }
+
+//         if (activeURL.length == 2 && historyURL.length == 2) {
+//             if (activeURL[1].tabID != historyURL[1].tabID) {
+//                 if (historyURL[1].windowID == activeURL[1].windowID) {
+//                     historyURL[1].referralURL = activeURL[1].url
+//                 }
+//             }
+//         }
+
+//         console.log(historyURL)
+        
+//     })
+
+//   });
+
+
+//   chrome.tabs.onUpdated.addListener(
+//     function (tabId, changeInfo, tab) {
+        
+//         // for some reason the new URL is not being added
+//         if (changeInfo.url !== undefined) {
+//             console.log("realURL change from changeinfo")
+//             console.log(changeInfo.url)
+//         }
+
+//         /* update change in URL in historyURL */
+//         for (var i = 0, ie = historyURL.length; i < ie; ++i) {
+//             if (tabId == historyURL[i].tabID) {
+//                 if (changeInfo.url !== undefined) {
+//                     historyURL[i].url = changeInfo.url
+//                 }
+//             }
+//         }
+
+//         /* update change in URL in activeURL */
+//         for (var i = 0, ie = activeURL.length; i < ie; ++i) {
+//             if (tabId == activeURL[i].tabID) {
+//                 if (changeInfo.url !== undefined) {
+//                     activeURL[i].url = changeInfo.url
+//                 }
+//             }
+//         }
+
+//         console.log(historyURL)
+        
+//     }
+// );
+
+
+/* -------------------------------------------------------------------------------------------------------------------------------------------- */
+//one more time we redo this nonsense
+
+activeList= []
+historyList = []
+
+lastHistoryListItem = historyList.length - 1
+lastActiveListItem = activeList.length - 1
+
+function historyListPush (tab)  {
+    historyList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
+}
+
+function activeListPush (tab.id, tab.url, tab.windowId) {
+    activeList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
+}
+
+function activeListLengthChecker () {
+    if (activeList.length == 3) {
+        activeList.shift()
+    }
+}
+
+function historyListLengthChecker () {
+    if (historyList.length == 3) {
+        historyList.shift()
+    }
+}
+
+function urlChangeSameTab () {
+    //Here we are checking if the last item in the activeList is the same tab as the last item in the historyList
+    if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
+        //Here we are check if the last historyList item and the first historyList item come from the same window
+        if (historyList[0].windowID == historyList[historyList.length - 1].windowID) {
+            //Because because the activeList and historyList share the same last tabID & the last two historyList items share the same windowID, this is a same tab transition
+            historyList[historyList.length - 1].referralURL = historyList[0].url
+        }
+    }
+}
+
+function openInNewWindow () {
+     //Here we check if the last activeList item has the same tabID as the lastHistoryList item
+     if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
+        //here we check if the last historyList item has the same windowID as the current one
+        if (historyList[historyList.length - 1].windowID != historyList[0].windowID) {
+            //because the first and last historyList items don't share the same windowId, and  the last activeList and historyList items share the same tabId
+            historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+        }
+     }
+
+}
+
+function openInNewTab () {
+    //check if the windowID between the last activeList item and historyList item is the same
+    if (activeList[activeList.length - 1].windowID == historyList[historyList.length - 1]) {
+        //check if the last activeList item is not the same tab as the last historyList item
+        if (activeList[activeList.length - 1].tabId != historyList[historyList.length - 1].tabId) {
+            //if both the last activeList and historyList items have the same windowID but not the same tabID, referralURL is the last activeList item
+            historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+        }
+    }
+}
+
+function historyListItemUpdater () {
+    for (var i = 0, ie = historyList.length; i < ie; ++i) {
+        if (tabId == historyList[i].tabID) {
+            if (changeInfo.url !== undefined) {
+                historyList[i].url = changeInfo.url
+            }
+        }
+    }
+}
+
+function visitListItemUpdater () {
+    for (var i = 0, ie = activeList.length; i < ie; ++i) {
+        if (tabId == activeList[i].tabID) {
+            if (changeInfo.url !== undefined) {
+                activeList[i].url = changeInfo.url
+            }
+        }
+    }
+}
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
     console.log("The user changed to tab with id: " + activeInfo.tabId);
     
-    activeTabID = activeInfo.tabId
+    // activeTabID = activeInfo.tabId
     console.log("activeTabID at the onActivated")
-    console.log(activeTabID)
+    console.log(activeInfo.tabId)
 
-    chrome.tabs.get(activeTabID, function (tab) {
+    chrome.tabs.get(activeInfo.tabId, function (tab) {
         
         /* this is to record the active URL */
-        activeURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
+        activeListPush(tab.id, tab.url, tab.windowId);
+        console.log("onActivated activeList push")
         
-        /* this is to record the history URL */
-        // historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId})
-
-        /* keep the length of the activeURL at 2 */
-        if (activeURL.length == 3) {
-            activeURL.shift()
-        }
+        activeListLengthChecker();
+        historyListLengthChecker();
 
         /* push url with no limitations, empty list */
-        if (historyURL.length == 0) {
-            historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
-        }
+        // if (historyList.length == 0) {
+        //     historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+        // }
 
         /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
-        if (historyURL.length == 1) {
-            if (historyURL[0].tabID != activeTabID) {
-                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
-            }
-        }
+        // if (historyList.length == 1) {
+        //     if (historyList[0].tabID != activeTabID) {
+        //         historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+        //     }
+        // }
 
         /* this is another block to prevent double entry of a new tab */
-        if (historyURL.length == 2) {
-            if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
-                //this should account for the double entry of a new tab
-                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
-            }
-        }
+        // if (historyList.length == 2) {
+        //     if (historyList[0].tabID != activeTabID && historyList[1].tabID != activeTabID) {
+        //         //this should account for the double entry of a new tab
+        //         historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+        //     }
+        // }
 
-        /* keep the length of the historyURL at 2 */
-        if (historyURL.length == 3) {
-            historyURL.shift()
-        }
-
-        console.log(historyURL)
+        console.log("historyList")
+        console.log(historyList)
+        console.log("activeList")
+        console.log(activeList)
         
     })
 
   });
 
-
-
   chrome.tabs.onCreated.addListener(function(onCreatedInfo) {
     console.log("A new tab was created with id: " + onCreatedInfo.id);
 
-    onCreatedTabID = onCreatedInfo.id
+    // onCreatedTabID = onCreatedInfo.id
 
-    chrome.tabs.get(onCreatedTabID, function (tab) {
+    chrome.tabs.get(onCreatedInfo.id, function (tab) {
         //add the latest created item to the history item
-        // historyURL.push({tabID: onCreatedInfo, url: tab.url, windowID: tab.windowId})
+
+        if (onCreatedInfo.windowId !== undefined) {
+            historyListPush();
+        }
+        
+        console.log("onCreated historyList push")
+        historyListLengthChecker();
 
         /* push url with no limitations, empty list */
-        if (historyURL.length == 0) {
-            historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
-        }
+        // if (historyURL.length == 0) {
+        //     historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+        // }
 
         /* when making a new tab, both the onCreated and onActivated gets active, this way you don't get two entries for a new tab */
-        if (historyURL.length == 1) {
-            if (historyURL[0].tabID != activeTabID) {
-                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
-            }
-        }
+        // if (historyURL.length == 1) {
+        //     if (historyURL[0].tabID != activeTabID) {
+        //         historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
+        //     }
+        // }
 
         /* this is another block to prevent double entry of a new tab */
-        if (historyURL.length == 2) {
-            if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
-                //this should account for the double entry of a new tab
-                historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL:""})
-            }
-        }
-
-        /* keep the length of the historyURL at 2 */
-        if (historyURL.length == 3) {
-            historyURL.shift()
-        }
+        // if (historyURL.length == 2) {
+        //     if (historyURL[0].tabID != activeTabID && historyURL[1].tabID != activeTabID) {
+        //         //this should account for the double entry of a new tab
+        //         historyURL.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL:""})
+        //     }
+        // }
 
         /* filter for new tab */
-        if (activeURL.length == 2 && historyURL.length == 2) {
-            if (activeURL[1].tabID == historyURL.tabID) {
-                if (historyURL[1].windowID == historyURL[0].windowID) {
-                    historyURL[1].referralURL = historyURL[0].url
+        if (activeList.length == 2 && historyList.length == 2) {
+            console.log("first layer top")
+            if (activeList[1].tabID == historyList[1].tabID) {
+                console.log("second layer")
+                if (historyList[1].windowID == historyList[0].windowID) {
+                    historyList[1].referralURL = historyList[0].url
+                    console.log("third layer")
                 }
+                console.log("transition in same tab")
+
+
+                if (historyList[1].windowID != historyList[1].windowID) {
+                    historyList[1].referralURL = activeList[0].url
+                    console.log("second third layer")
+                }
+                console.log("transition happened via new window")
             }
 
-            if (historyURL[1].windowID != historyURL[1].windowID) {
-                historyURL[1].referralURL = activeURL[0].url
+            
+        }
+
+        /* This block works */
+        if (activeList.length == 2 && historyList.length == 2) {
+            console.log("first layer bottom")
+            if (activeList[1].tabID != historyList[1].tabID) {
+                if (historyList[1].windowID == activeList[1].windowID) {
+                    historyList[1].referralURL = activeList[1].url
+                    console.log("open in new tab event listener")
+                }
             }
         }
 
-        if (activeURL.length == 2 && historyURL.length == 2) {
-            if (activeURL[1].tabID != historyURL[1].tabID) {
-                if (historyURL[1].windowID == activeURL[1].windowID) {
-                    historyURL[1].referralURL = activeURL[1].url
-                }
-            }
-        }
-
-        console.log(historyURL)
+        console.log("historyList")
+        console.log(historyList)
+        console.log("activeList")
+        console.log(activeList)
         
     })
 
@@ -952,27 +1191,88 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         if (changeInfo.url !== undefined) {
             console.log("realURL change from changeinfo")
             console.log(changeInfo.url)
+            console.log(changeInfo.windowID)
+
+            
+            //I don't like this in it's current state    
+            // chrome.tabs.get(tabId, 
+            //     function (tab) {
+            //         console.log("chrome.tabs.get function")
+            //         console.log(tab.windowId)
+            //         if (historyList.length == 2) {
+            //             if (changeInfo.url != historyList[1].url) {
+            //                 historyListPush();
+    
+            //             }
+            //         }
+            //     }    
+            // )
+            
+            
+            
         }
 
-        /* update change in URL in historyURL */
-        for (var i = 0, ie = historyURL.length; i < ie; ++i) {
-            if (tabId == historyURL[i].tabID) {
+        /* update change in URL in historyList */
+        for (var i = 0, ie = historyList.length; i < ie; ++i) {
+            if (tabId == historyList[i].tabID) {
                 if (changeInfo.url !== undefined) {
-                    historyURL[i].url = changeInfo.url
+                    historyList[i].url = changeInfo.url
                 }
             }
         }
 
-        /* update change in URL in activeURL */
-        for (var i = 0, ie = activeURL.length; i < ie; ++i) {
-            if (tabId == activeURL[i].tabID) {
+        /* update change in URL in activeList as an historyList item */
+        // for (var i = 0, ie = activeList.length; i < ie; ++i) {
+        //     if (tabId == activeList[i].tabID) {
+        //         if (changeInfo.url !== undefined && changeInfo.windowID !== undefined) {
+        //             historyList.push({tabID: tabId, url: tab.url, windowID: tab.windowID, referralURL: ''})
+        //             console.log("onUpdated historyList push")
+        //         }
+        //     }
+        // }
+
+        /* keep the length of the historyURL at 2 */
+        historyListLengthChecker();
+
+        /* update change in URL in activeList */
+        for (var i = 0, ie = activeList.length; i < ie; ++i) {
+            if (tabId == activeList[i].tabID) {
                 if (changeInfo.url !== undefined) {
-                    activeURL[i].url = changeInfo.url
+                    activeList[i].url = changeInfo.url
+                    chrome.tabs.get(tabId, function (tab) {
+                        historyListPush();
+                    })
+                    historyListLengthChecker();
                 }
             }
         }
 
-        console.log(historyURL)
+
+        // if (activeList.length == 2 && historyList.length == 2) {
+        //     console.log("first layer top")
+        //     if (activeList[1].tabID == historyList[1].tabID) {
+        //         console.log("second layer")
+        //         if (historyList[1].windowID == historyList[0].windowID) {
+        //             historyList[1].referralURL = historyList[0].url
+        //             console.log("third layer")
+        //         }
+        //         console.log("transition in same tab")
+
+
+        //         if (historyList[1].windowID != historyList[1].windowID) {
+        //             historyList[1].referralURL = activeList[0].url
+        //             console.log("second third layer")
+        //         }
+        //         console.log("transition happened via new window")
+        //     }
+   
+        // }
+
+        console.log("historyList")
+        console.log(historyList)
+        console.log("activeList")
+        console.log(activeList)
         
     }
 );
+
