@@ -404,11 +404,11 @@ randoList = []
 //         console.log(historyObject)
 //         console.log(new Date(timeOfURLVisit))
         
-//         // chrome.history.search({
-//         //     'text': '',              
-//         //     'startTime': timeOfURLVisit  
-//         //     },
-//         //     function(historyItems) {
+//         chrome.history.search({
+//             'text': '',              
+//             'startTime': timeOfURLVisit  
+//             },
+//             function(historyItems) {
 //         //     for (var i = 0; i < historyItems.length; ++i) {
 //         //         var url = historyItems[i];
 //         //         // this code is redundant
@@ -988,55 +988,90 @@ lastHistoryListItem = historyList.length - 1
 lastActiveListItem = activeList.length - 1
 
 function historyListPush (tab)  {
+    // if (historyList.length == 0) {
+    //     historyList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
+    // }
+
+    // if (historyList.length >= 1) {
+    //     if (historyList[historyList.length - 1].tabID != tab.id || historyList[historyList.length -1].url != tab.url) {
+    //         historyList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
+    //     }
+    // }
+
     historyList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
 }
 
-function activeListPush (tab.id, tab.url, tab.windowId) {
+function activeListPush (tab) {
     activeList.push({tabID: tab.id, url: tab.url, windowID: tab.windowId, referralURL: ''})
 }
 
 function activeListLengthChecker () {
     if (activeList.length == 3) {
         activeList.shift()
+        console.log("object removed from activeList")
     }
 }
 
 function historyListLengthChecker () {
     if (historyList.length == 3) {
         historyList.shift()
+        console.log("object removed from historyList")
     }
 }
 
 function urlChangeSameTab () {
-    //Here we are checking if the last item in the activeList is the same tab as the last item in the historyList
-    if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
-        //Here we are check if the last historyList item and the first historyList item come from the same window
-        if (historyList[0].windowID == historyList[historyList.length - 1].windowID) {
-            //Because because the activeList and historyList share the same last tabID & the last two historyList items share the same windowID, this is a same tab transition
-            historyList[historyList.length - 1].referralURL = historyList[0].url
+    if (activeList.length >= 1 && historyList.length == 2) {
+    // console.log("length size checker - urlChangeSameTab")
+        //Here we are checking if the last item in the activeList is the same tab as the last item in the historyList
+        if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
+        // console.log("tabID checker - urlChangeSameTab")
+            //Here we are check if the last historyList item and the first historyList item come from the same window
+            if (historyList[0].windowID == historyList[historyList.length - 1].windowID) {
+            // console.log("windowID checker - urlChangeSameTab")
+                if (historyList[1].tabID == historyList[0].tabID) {
+                    console.log("same tab url change - urlChangeSameTab")
+                    historyList[historyList.length - 1].referralURL = historyList[0].url
+                }
+                //Because because the activeList and historyList share the same last tabID & the last two historyList items share the same windowID, this is a same tab transition
+                
+            }
         }
     }
 }
 
 function openInNewWindow () {
-     //Here we check if the last activeList item has the same tabID as the lastHistoryList item
-     if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
-        //here we check if the last historyList item has the same windowID as the current one
-        if (historyList[historyList.length - 1].windowID != historyList[0].windowID) {
-            //because the first and last historyList items don't share the same windowId, and  the last activeList and historyList items share the same tabId
-            historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+    if (activeList.length >= 1 && historyList.length >= 1) {
+    // console.log("length size checker - openInNewWindow")
+        //Here we check if the last activeList item has the same tabID as the lastHistoryList item
+        if (activeList[activeList.length - 1].tabID == historyList[historyList.length - 1].tabID) {
+        // console.log("tabID checker - openInNewWindow")
+            //here we check if the last historyList item has the same windowID as the current one
+            if (historyList[historyList.length - 1].windowID != historyList[0].windowID) {
+            // console.log("windowID checker - openInNewWindow")
+                //because the first and last historyList items don't share the same windowId, and  the last activeList and historyList items share the same tabId
+                // historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+                historyList[historyList.length - 1].referralURL = activeList[0].url
+                console.log("url opened in new window - openInNewWindow")
+            }
         }
-     }
+    }
+     
 
 }
 
 function openInNewTab () {
-    //check if the windowID between the last activeList item and historyList item is the same
-    if (activeList[activeList.length - 1].windowID == historyList[historyList.length - 1]) {
-        //check if the last activeList item is not the same tab as the last historyList item
-        if (activeList[activeList.length - 1].tabId != historyList[historyList.length - 1].tabId) {
-            //if both the last activeList and historyList items have the same windowID but not the same tabID, referralURL is the last activeList item
-            historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+    if (activeList.length >= 1 && historyList.length >= 1) {
+    // console.log("length size checker - openInNewTab")
+        //check if the windowID between the last activeList item and historyList item is the same
+        if (activeList[activeList.length - 1].windowID == historyList[historyList.length - 1].windowID) {
+        // console.log("windowID checker - openInNewTab")
+            //check if the last activeList item is not the same tab as the last historyList item
+            if (activeList[activeList.length - 1].tabID != historyList[historyList.length - 1].tabID) {
+            // console.log("tabID checker - openInNewTab")
+                //if both the last activeList and historyList items have the same windowID but not the same tabID, referralURL is the last activeList item
+                historyList[historyList.length - 1].referralURL = activeList[activeList.length - 1].url
+                console.log("url opened in new tab - openInNewTab")
+            }
         }
     }
 }
@@ -1065,18 +1100,26 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     console.log("The user changed to tab with id: " + activeInfo.tabId);
     
     // activeTabID = activeInfo.tabId
-    console.log("activeTabID at the onActivated")
-    console.log(activeInfo.tabId)
+    // console.log("activeTabID at the onActivated")
+    // console.log(activeInfo.tabId)
 
     chrome.tabs.get(activeInfo.tabId, function (tab) {
         
         /* this is to record the active URL */
-        activeListPush(tab.id, tab.url, tab.windowId);
+        activeListPush(tab);
         console.log("onActivated activeList push")
         
         activeListLengthChecker();
-        historyListLengthChecker();
 
+        openInNewWindow();
+
+        if (tab.url == "chrome://newtab/") {
+            console.log("historyListPush")
+            historyListPush(tab);
+        }
+
+
+        
         /* push url with no limitations, empty list */
         // if (historyList.length == 0) {
         //     historyList.push({tabID: activeTabID, url: tab.url, windowID: tab.windowId, referralURL: ""})
@@ -1114,12 +1157,19 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
     chrome.tabs.get(onCreatedInfo.id, function (tab) {
         //add the latest created item to the history item
 
-        if (onCreatedInfo.windowId !== undefined) {
-            historyListPush();
-        }
+        // if (onCreatedInfo.windowId !== undefined && onCreatedInfo.url !== undefined) {
+        //     historyListPush(tab);
+        //     console.log("onCreated historyList push")
+        // }
+
+        historyListLengthChecker
+
+        // if (tab.url == "chrome://newtab/") {
+        //     console.log("historyListPush")
+        //     historyListPush(tab);
+        // }
+
         
-        console.log("onCreated historyList push")
-        historyListLengthChecker();
 
         /* push url with no limitations, empty list */
         // if (historyURL.length == 0) {
@@ -1142,44 +1192,48 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
         // }
 
         /* filter for new tab */
-        if (activeList.length == 2 && historyList.length == 2) {
-            console.log("first layer top")
-            if (activeList[1].tabID == historyList[1].tabID) {
-                console.log("second layer")
-                if (historyList[1].windowID == historyList[0].windowID) {
-                    historyList[1].referralURL = historyList[0].url
-                    console.log("third layer")
-                }
-                console.log("transition in same tab")
+        // if (activeList.length == 2 && historyList.length == 2) {
+        //     console.log("first layer top")
+        //     if (activeList[1].tabID == historyList[1].tabID) {
+        //         console.log("second layer")
+        //         if (historyList[1].windowID == historyList[0].windowID) {
+        //             historyList[1].referralURL = historyList[0].url
+        //             console.log("third layer")
+        //         }
+        //         console.log("transition in same tab")
 
 
-                if (historyList[1].windowID != historyList[1].windowID) {
-                    historyList[1].referralURL = activeList[0].url
-                    console.log("second third layer")
-                }
-                console.log("transition happened via new window")
-            }
+        //         if (historyList[1].windowID != historyList[1].windowID) {
+        //             historyList[1].referralURL = activeList[0].url
+        //             console.log("second third layer")
+        //         }
+        //         console.log("transition happened via new window")
+        //     }
 
             
-        }
+        // }
 
         /* This block works */
-        if (activeList.length == 2 && historyList.length == 2) {
-            console.log("first layer bottom")
-            if (activeList[1].tabID != historyList[1].tabID) {
-                if (historyList[1].windowID == activeList[1].windowID) {
-                    historyList[1].referralURL = activeList[1].url
-                    console.log("open in new tab event listener")
-                }
-            }
-        }
+        // if (activeList.length == 2 && historyList.length == 2) {
+        //     console.log("first layer bottom")
+        //     if (activeList[1].tabID != historyList[1].tabID) {
+        //         if (historyList[1].windowID == activeList[1].windowID) {
+        //             historyList[1].referralURL = activeList[1].url
+        //             console.log("open in new tab event listener")
+        //         }
+        //     }
+        // }
 
-        console.log("historyList")
-        console.log(historyList)
-        console.log("activeList")
-        console.log(activeList)
+        // console.log("historyList")
+        // console.log(historyList)
+        // console.log("activeList")
+        // console.log(activeList)
         
     })
+
+    // openInNewTab();
+    // openInNewWindow();
+    // historyListLengthChecker();
 
   });
 
@@ -1192,60 +1246,105 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
             console.log("realURL change from changeinfo")
             console.log(changeInfo.url)
             console.log(changeInfo.windowID)
-
             
+            // for (var i = 0, ie = historyList.length; i < ie; ++i) {
+            //     if (historyList[i].url != changeInfo.url || historyList[i].tabID != tabId) {
+            //         historyListPush(tab);
+            //     }
+            // }
+            
+            
+            // if (historyList.length == 2) {
+                // if (changeInfo.url != historyList[historyList.length - 1].url) {
+                //     historyListPush(tab);
+                //     console.log("chrome.tabs.onUpdated historyList push")
+                // }
+            // }
+            
+
             //I don't like this in it's current state    
             // chrome.tabs.get(tabId, 
             //     function (tab) {
             //         console.log("chrome.tabs.get function")
-            //         console.log(tab.windowId)
-            //         if (historyList.length == 2) {
-            //             if (changeInfo.url != historyList[1].url) {
-            //                 historyListPush();
-    
-            //             }
+            //         if (changeInfo.url != historyList[historyList.length - 1].url) {
+            //             historyListPush(tab);
+            //             console.log("chrome.tabs.onUpdated historyList push")
             //         }
             //     }    
-            // )
-            
-            
-            
+            // )          
         }
 
         /* update change in URL in historyList */
-        for (var i = 0, ie = historyList.length; i < ie; ++i) {
-            if (tabId == historyList[i].tabID) {
-                if (changeInfo.url !== undefined) {
-                    historyList[i].url = changeInfo.url
-                }
-            }
-        }
-
-        /* update change in URL in activeList as an historyList item */
-        // for (var i = 0, ie = activeList.length; i < ie; ++i) {
-        //     if (tabId == activeList[i].tabID) {
-        //         if (changeInfo.url !== undefined && changeInfo.windowID !== undefined) {
-        //             historyList.push({tabID: tabId, url: tab.url, windowID: tab.windowID, referralURL: ''})
-        //             console.log("onUpdated historyList push")
+        // for (var i = 0, ie = historyList.length; i < ie; ++i) {
+        //     if (tabId == historyList[i].tabID) {
+        //         if (changeInfo.url !== undefined) {
+        //             console.log("historyList updated")
+        //             historyList[i].url = changeInfo.url
         //         }
         //     }
         // }
+
+        /* update change in URL in activeList as an historyList item */
+        for (var i = 0, ie = activeList.length; i < ie; ++i) {
+            if (tabId == activeList[i].tabID) {
+                if (changeInfo.url !== undefined/*  && changeInfo.windowID !== undefined */) {
+                    activeList[i].url = changeInfo.url
+                    console.log("activeList updated")
+                    //right now everything works except for change in same URL
+                }
+            }
+        }
 
         /* keep the length of the historyURL at 2 */
         historyListLengthChecker();
 
         /* update change in URL in activeList */
-        for (var i = 0, ie = activeList.length; i < ie; ++i) {
-            if (tabId == activeList[i].tabID) {
-                if (changeInfo.url !== undefined) {
-                    activeList[i].url = changeInfo.url
-                    chrome.tabs.get(tabId, function (tab) {
-                        historyListPush();
-                    })
-                    historyListLengthChecker();
-                }
-            }
-        }
+        // for (var i = 0, ie = activeList.length; i < ie; ++i) {
+        //     if (tabId == activeList[i].tabID) {
+        //         if (changeInfo.url !== undefined) {
+        //             activeList[i].url = changeInfo.url
+        //             console.log("updating active list")
+        //             historyListPush(tab)
+        //             chrome.tabs.get(tabId, function (tab) {
+        //                 // for (var i = 0, ie = historyList.length; i < ie; ++i) {
+        //                     console.log(historyList[historyList.length - 1].url)
+        //                     console.log(tab.url)
+        //                     console.log(historyList[historyList.length - 1].tabID)
+        //                     console.log(tab.id)
+        //                     if (tab.url != historyList[historyList.length - 1].url || tab.id != historyList[historyList.length - 1].tabID) {
+        //                         historyListPush(tab);
+        //                         console.log("change in URL historyList push")
+        //                     }
+        //                 // }
+        //             })
+        //             historyListLengthChecker();
+        //         }
+        //     }
+        // }
+
+        // if (activeList.length == 1) {
+        //     if (tabId == activeList[0].tabID && changeInfo.url !== undefined) {
+        //         activeList[0].url = changeInfo.url
+
+        //         if (tab.url != historyList[historyList.length - 1].url || tab.id != historyList[historyList.length - 1].tabID) {
+        //             historyListPush(tab);
+        //         }
+        //     }
+        // }
+
+        // if (activeList.length == 2 && changeInfo.url !== undefined) {
+        //     if (tabId == activeList[0].tabID || tabId == activeList[1].tabID) {
+        //         activeList[i].url = changeInfo.url
+
+        //         if (tab.url != historyList[0].url || tab.id != historyList[0].tabID) {
+        //             historyListPush(tab);
+        //         }
+
+        //         if (tab.url != historyList[1].url || tab.id != historyList[1].tabID) {
+        //             historyListPush(tab);
+        //         }
+        //     }
+        // }
 
 
         // if (activeList.length == 2 && historyList.length == 2) {
@@ -1268,11 +1367,65 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
    
         // }
 
+        openInNewTab();
+        openInNewWindow();
+        historyListLengthChecker();
+        urlChangeSameTab();
+
         console.log("historyList")
         console.log(historyList)
         console.log("activeList")
         console.log(activeList)
+
+        // console.log(activeList[0].tabID)
+        // console.log(historyList[0].tabID)
         
     }
 );
 
+
+
+chrome.history.onVisited.addListener(
+    function (historyItem) {
+        chrome.tabs.query({url: historyItem.url}, function (tab) {
+            console.log("chrome.tabs.query")
+            console.log(tab[0])
+            console.log(tab.length)
+
+            tabToPush = tab[0]
+
+            if (tab[0] != undefined) {
+
+                if (historyList.length == 0) {
+                    historyListPush(tab[0]);
+                    console.log("historyList Push length == 0")
+                }
+
+                if (historyList.length >= 1) {
+                    console.log(historyList[historyList.length - 1].url)
+                    console.log(tab[0].url)
+                    console.log(tab[0].id)
+                    console.log(historyList[historyList.length - 1].tabID)
+                    if (tab[0].url != historyList[historyList.length - 1].url || tab[0].id != historyList[historyList.length - 1].tabID) {
+                        historyListPush(tabToPush);
+                        console.log("historyList Push length >= 1")
+                    }
+                }
+            }
+            
+            historyListLengthChecker();
+            console.log(historyList)
+            // console.log(tab.url)
+
+            // for (var i = 0, ie = tab.length; i < ie; i++) {
+            //     if (tab.status == "complete") {
+            //         console.log(tab)
+            //     }
+            // }
+
+            // if (tab.status == "complete") {
+            //     console.log(tab[0])
+            // }
+        }) 
+    }
+)
